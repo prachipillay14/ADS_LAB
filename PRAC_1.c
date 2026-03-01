@@ -1,0 +1,129 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int bookID;
+    struct node *left;
+    struct node *right;
+};
+
+struct node* createNode(int id) {
+    struct node* newNode = (struct node*)malloc(sizeof(struct node));
+    newNode->bookID = id;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+struct node* insert(struct node* root, int id) {
+    if (root == NULL)
+        return createNode(id);
+
+    if (id < root->bookID)
+        root->left = insert(root->left, id);
+    else if (id > root->bookID)
+        root->right = insert(root->right, id);
+
+    return root;
+}
+
+struct node* search(struct node* root, int id) {
+    if (root == NULL || root->bookID == id)
+        return root;
+
+    if (id < root->bookID)
+        return search(root->left, id);
+    else
+        return search(root->right, id);
+}
+
+void inorder(struct node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->bookID);
+        inorder(root->right);
+    }
+}
+
+struct node* findMin(struct node* root) {
+    while (root->left != NULL)
+        root = root->left;
+    return root;
+}
+
+struct node* deleteBook(struct node* root, int id) {
+    if (root == NULL)
+        return root;
+
+    if (id < root->bookID)
+        root->left = deleteBook(root->left, id);
+    else if (id > root->bookID)
+        root->right = deleteBook(root->right, id);
+    else {
+        if (root->left == NULL && root->right == NULL) {
+            free(root);
+            return NULL;
+        }
+        else if (root->left == NULL) {
+            struct node* temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL) {
+            struct node* temp = root->left;
+            free(root);
+            return temp;
+        }
+        struct node* temp = findMin(root->right);
+        root->bookID = temp->bookID;
+        root->right = deleteBook(root->right, temp->bookID);
+    }
+    return root;
+}
+
+void rangeSearch(struct node* root, int low, int high) {
+    if (root == NULL)
+        return;
+
+    if (low < root->bookID)
+        rangeSearch(root->left, low, high);
+
+    if (root->bookID >= low && root->bookID <= high)
+        printf("%d ", root->bookID);
+
+    if (high > root->bookID)
+        rangeSearch(root->right, low, high);
+}
+
+int main() {
+    struct node* root = NULL;
+
+    root = insert(root, 100);
+    insert(root, 50);
+    insert(root, 150);
+    insert(root, 30);
+    insert(root, 70);
+    insert(root, 120);
+    insert(root, 180);
+
+    printf("Books in Sorted Order: ");
+    inorder(root);
+
+    int id = 70;
+    if (search(root, id))
+        printf("\nBook %d Found", id);
+    else
+        printf("\nBook %d Not Found", id);
+
+    root = deleteBook(root, 50);
+
+    printf("\nAfter Deletion: ");
+    inorder(root);
+
+    printf("\nBooks between 60 and 160: ");
+    rangeSearch(root, 60, 160);
+
+    return 0;
+}
+
+
