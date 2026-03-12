@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+struct TrieNode {
+    struct TrieNode *children[ALPHABET_SIZE];
+    int flag;   // flag = 1 means end of word
+};
+
+struct TrieNode* createNode() {
+    struct TrieNode* node = (struct TrieNode*)malloc(sizeof(struct TrieNode));
+
+    node->flag = 0;
+
+    for(int i = 0; i < ALPHABET_SIZE; i++)
+        node->children[i] = NULL;
+
+    return node;
+}
+
+void insert(struct TrieNode* root, char *key) {
+
+    struct TrieNode* temp = root;
+
+    for(int i = 0; key[i] != '\0'; i++) {
+
+        char ch = tolower(key[i]);
+
+        if(ch < 'a' || ch > 'z')
+            continue;
+
+        int index = ch - 'a';
+
+        if(temp->children[index] == NULL)
+            temp->children[index] = createNode();
+
+        temp = temp->children[index];
+    }
+
+    temp->flag = 1;   // mark end of word
+}
+
+int search(struct TrieNode* root, char *key) {
+
+    struct TrieNode* temp = root;
+
+    for(int i = 0; key[i] != '\0'; i++) {
+
+        char ch = tolower(key[i]);
+
+        if(ch < 'a' || ch > 'z')
+            continue;
+
+        int index = ch - 'a';
+
+        if(temp->children[index] == NULL)
+            return 0;
+
+        temp = temp->children[index];
+    }
+
+    return temp->flag;
+}
+
+int main() {
+
+    struct TrieNode* root = createNode();
+
+    char data[] =
+    "and\tbat\tball\tbook\tcot\tcotton\tinternet\tinterview\tjoy\tjob\tKing\tLion\tman\tmango\tmanage";
+
+    char *token = strtok(data, "\t");
+
+    while(token != NULL) {
+        insert(root, token);
+        token = strtok(NULL, "\t");
+    }
+
+    char word[50];
+
+    printf("Enter word to search: ");
+    scanf("%s", word);
+
+    if(search(root, word))
+        printf("Word found in Trie\n");
+    else
+        printf("Word not found in Trie\n");
+
+    return 0;
+}
