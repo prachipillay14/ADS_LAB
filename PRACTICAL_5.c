@@ -1,0 +1,80 @@
+#include <stdio.h>
+
+#define MAX 10
+
+int graph[MAX][MAX], visited[MAX];
+int n;
+
+/* Depth First Search */
+void DFS(int v)
+{
+    visited[v] = 1;
+
+    for(int i = 0; i < n; i++)
+    {
+        if(graph[v][i] == 1 && visited[i] == 0)
+            DFS(i);
+    }
+}
+
+/* Function to check articulation nodes */
+void findSingleNodeFailure()
+{
+    int count, failureFound = 0;
+
+    for(int removed = 0; removed < n; removed++)
+    {
+        for(int i = 0; i < n; i++)
+            visited[i] = 0;
+
+        int start = -1;
+
+        for(int i = 0; i < n; i++)
+        {
+            if(i != removed)
+            {
+                start = i;
+                break;
+            }
+        }
+
+        DFS(start);
+
+        count = 0;
+
+        for(int i = 0; i < n; i++)
+        {
+            if(i != removed && visited[i] == 1)
+                count++;
+        }
+
+        if(count != n - 1)
+        {
+            printf("Node %d failure disconnects the network\n", removed);
+            failureFound = 1;
+        }
+    }
+
+    if(!failureFound)
+        printf("No single node failure detected\n");
+}
+
+int main()
+{
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter adjacency matrix:\n");
+
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < n; j++)
+        {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    findSingleNodeFailure();
+
+    return 0;
+}
