@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #define TABLE_SIZE 10
-
 char hashTable[TABLE_SIZE][20];
 int hashFunction(char key[])
 {
